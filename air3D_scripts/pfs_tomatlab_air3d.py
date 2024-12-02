@@ -39,13 +39,13 @@ tMax=1.0
 omega_a=5.5
 
 times = [0.5*tMax]
-# times = [0.]
+times = [0.]
 
 num_times = len(times)
 
 # Theta slices to be plotted
 thetas = [0.5*math.pi]
-thetas = [math.pi]
+# thetas = [math.pi]
 num_thetas = len(thetas)
 
 # Create a figure
@@ -77,14 +77,15 @@ model_out = (model_out*var/norm_to) + mean
 
 # Plot the zero level sets
 
-# plot contour level plot
-min_value = np.min(model_out)
-max_value = np.max(model_out)
-levels = np.linspace(min_value, max_value, 10)
-
 # include 0. in levels
 
-levels = np.sort(np.concatenate((levels, [0.])))
+# pfs
+model_out = utils.estimate_failure_probability(model_out)
+min_value = np.min(model_out)
+max_value = np.max(model_out)
+levels = np.linspace(min_value, max_value, 5)
+print("min, max", min_value, max_value)
+# levels = np.sort(np.concatenate((levels, [0.])))
 
 ax = fig.add_subplot(num_times, num_thetas, (0+1) + 0*num_thetas)
 ax.set_title('t = %0.2f, theta = %0.2f' % (times[0], thetas[0]))
@@ -104,8 +105,8 @@ omega_index=omega_a*10
 th_index=thetas[0]*100
 t_index=times[0]*10
 
-path = os.path.join(root_path, 'aBRS_plot_omega_%.2d_th_%.2d_t_%.2d.png' % (omega_index,th_index,t_index))
+path = os.path.join(root_path, 'Pfs_plot_omega_%.2d_th_%.2d_t_%.2d.png' % (omega_index,th_index,t_index))
 fig.savefig(path)
 # print
 print('Saved figure at: %s' % path)
-scipy.io.savemat(os.path.join(root_path, 'BRT_omega_%.2d_th_%.3d_t_%.2d.mat' % (omega_index,th_index,t_index)), {'model_out': model_out})
+scipy.io.savemat(os.path.join(root_path, 'Pfs_omega_%.2d_th_%.3d_t_%.2d.mat' % (omega_index,th_index,t_index)), {'model_out': model_out})

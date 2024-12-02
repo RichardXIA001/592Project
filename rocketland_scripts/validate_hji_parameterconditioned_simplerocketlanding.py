@@ -55,6 +55,7 @@ beta = dataset.beta
 
 # Time values at which the function needs to be plotted
 times = np.array([0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])*opt.tMax
+times = np.array([0., 0.5,  1.0])*opt.tMax
 num_times = np.shape(times)[0]
 
 # Slices to be plotted 
@@ -67,7 +68,7 @@ slices_toplot = [{'th' : 0.0, 'y_dot' : 0.0, 'z_dot' : 0.0, 'th_dot' : 0.0, 'par
 num_slices = len(slices_toplot)
 
 # Create a figure
-fig = plt.figure(figsize=(5*num_times, 5*num_slices))
+fig = plt.figure(figsize=(10*num_times, 10*num_slices))
 
 # Get the meshgrid in the (y, z) coordinate
 sidelen = 200
@@ -109,8 +110,11 @@ for i in range(num_times):
     # Plot the actual data
     ax = fig.add_subplot(num_times, num_slices, (j+1) + i*num_slices)
     ax.set_title('t = %0.2f, th = %0.2f, zd = %0.2f, p = %0.2f' % (times[i], slices_toplot[j]['th'], slices_toplot[j]['z_dot'], slices_toplot[j]['param']))
+    
+    
     s = ax.imshow(model_out.T, cmap='bwr', origin='lower', extent=(-1., 1., -1., 1.))
-    fig.colorbar(s) 
+    if j == num_slices-1:
+      fig.colorbar(s) 
 
 directory = os.path.join(root_path, 'validation')
 if not os.path.exists(directory):

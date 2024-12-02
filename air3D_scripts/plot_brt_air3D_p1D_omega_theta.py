@@ -20,6 +20,7 @@ checkpoint_toload=119000
 model = modules.SingleBVPNet(in_features=5, out_features=1, type='sine', mode='mlp', final_layer_factor=1., hidden_features=512, num_hidden_layers=3)
 model.cuda()
 root_path = os.path.join('./deepreach_uncertain_parameter/experiment_scripts/logs', '3Dp1D_u0')
+root_path = os.path.join('./logs', 'air3D1')
 ckpt_dir = os.path.join(root_path, 'checkpoints')
 ckpt_path = os.path.join(ckpt_dir, 'model_epoch_%04d.pth' % checkpoint_toload)
 checkpoint = torch.load(ckpt_path)

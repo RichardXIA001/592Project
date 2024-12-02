@@ -8,7 +8,7 @@ import numpy as np
 import scipy.io as spio
 import torch
 from torch.utils.data import Dataset
-from torchvision.transforms import Resize, Compose, ToTensor, Normalize
+# from torchvision.transforms import Resize, Compose, ToTensor, Normalize
 import diff_operators
 
 import utils
@@ -764,7 +764,6 @@ class ReachabilityParameterConditionedSimpleRocketLandingSource(Dataset):
 
     def __getitem__(self, idx):
         start_time = 0.  # time to apply  initial conditions
-
         # uniformly sample domain and include coordinates where source is non-zero 
         coords = torch.zeros(self.numpoints, self.num_states).uniform_(-1, 1)
 

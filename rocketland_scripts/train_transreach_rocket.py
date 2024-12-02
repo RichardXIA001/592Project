@@ -28,13 +28,13 @@ p.add_argument('--lr', type=float, default=2e-5, help='learning rate. default=2e
 p.add_argument('--num_epochs', type=int, default=100000,
                help='Number of epochs to train for.')
 
-p.add_argument('--epochs_til_ckpt', type=int, default=1000,
+p.add_argument('--epochs_til_ckpt', type=int, default=10,
                help='Time interval in seconds until checkpoint is saved.')
 p.add_argument('--steps_til_summary', type=int, default=100,
                help='Time interval in seconds until tensorboard summary is saved.')
 p.add_argument('--model', type=str, default='sine', required=False, choices=['sine', 'tanh', 'sigmoid', 'relu'],
                help='Type of model to evaluate, default is sine.')
-p.add_argument('--mode', type=str, default='mlp', required=False, choices=['mlp', 'rbf', 'pinn'],
+p.add_argument('--mode', type=str, default='transformer', required=False, choices=['mlp', 'rbf', 'pinn'],
                help='Whether to use uniform velocity parameter')
 p.add_argument('--tMin', type=float, default=0.0, required=False, help='Start time of the simulation')
 p.add_argument('--tMax', type=float, default=1.0, required=False, help='End time of the simulation')

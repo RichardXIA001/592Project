@@ -200,39 +200,14 @@ def train(model, train_dataloader, epochs, lr, steps_til_summary, epochs_til_che
                     tqdm.write("Epoch %d, Total loss %0.6f, iteration time %0.6f" % (epoch, train_loss, time.time() - start_time))
 
                     if val_dataloader is not None:
-                        device = 'cuda'
                         print("Running validation set...")
                         model.eval()
-                        val_losses = []
-                        
-                        # Use DataParallel if multiple GPUs are available
-                        if torch.cuda.device_count() > 1:
-                            print(f"Using {torch.cuda.device_count()} GPUs for parallel validation...")
-                            model = torch.nn.DataParallel(model)
-
-                        # Move model to the specified device
-                        model.to(device)
-
-                        # Perform validation in smaller chunks if memory is an issue
                         with torch.no_grad():
-                            for model_input, gt in val_dataloader:
-                                # Move data to the specified device
-                                model_input, gt = model_input.to(device), gt.to(device)
-
-                                # Forward pass
-                                try:
-                                    model_output = model(model_input)
-                                    val_loss = loss_fn(model_output, gt)
-                                except RuntimeError as e:
-                                    if "CUDA out of memory" in str(e):
-                                        print("CUDA out of memory. Reducing batch size...")
-                                        torch.cuda.empty_cache()
-                                        continue  # Skip this batch
-                                    else:
-                                        raise e
-
-                                # Store loss
-                                val_losses.append(val_loss.item())
+                            val_losses = []
+                            for (model_input, gt) in val_dataloader:
+                                model_output = model(model_input)
+                                val_loss = loss_fn(model_output, gt)
+                                val_losses.append(val_loss)
 
                             writer.add_scalar("val_loss", np.mean(val_losses), total_steps)
                         model.train()

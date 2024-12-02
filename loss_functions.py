@@ -321,7 +321,7 @@ def initialize_hji_rocketlanding(dataset, minWith, diffModel, dirichlet_loss_fac
     def hji_rocketlanding(model_output, gt):
         source_boundary_values = gt['source_boundary_values']
         x = model_output['model_in']  # (meta_batch_size, num_points, 10)
-        y = model_output['model_out']  # (meta_batch_size, num_points, 1)
+        y = model_output['model_out'].unsqueeze(0)  # (meta_batch_size, num_points, 1)
         dirichlet_mask = gt['dirichlet_mask']
 
         if torch.all(dirichlet_mask):

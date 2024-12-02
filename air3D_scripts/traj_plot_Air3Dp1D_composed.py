@@ -21,7 +21,7 @@ from matplotlib.gridspec import GridSpec
 import scipy.ndimage 
 
 # Basic parameters
-logging_root = './deepreach_uncertain_parameter/air3D_scripts/logs'
+logging_root = './logs'
 angle_alpha = 1.2
 speed = 0.75
 omega_b = 3.0
@@ -29,8 +29,9 @@ collisionR = 0.25
 
 # Checkpoint to load for the trajectory plots
 experiment_name = '3Dp1D_u0'
-# checkpoints_toload = [90000, 100000, 110000, 119000]
-# query_times = [0.8, 0.9, 1.0, 1.1]
+
+experiment_name = 'air3D1'
+
 
 checkpoints_toload = [119000]
 query_times = [1.0]
@@ -221,6 +222,8 @@ ax = fig.add_subplot(gs[0:3,0:3])
 xr=state_traj[:, 0]*1
 yr=state_traj[:, 1]*1
 col = np.where(xr*xr+yr*yr<collisionR*collisionR,'r','b')
+print(xr.shape, yr.shape)
+print(col.shape)
 s = ax.scatter(state_traj[:, 0][0:k_crash], state_traj[:, 1][0:k_crash],s=4,linewidth=0,c=col,zorder=1)
 
 #Plot start and omega change points

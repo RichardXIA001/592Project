@@ -14,8 +14,7 @@ class BatchLinear(nn.Linear):
             params = OrderedDict(self.named_parameters())
 
         bias = params.get('bias', None)
-        weight = params['weight']
-
+        weight = params['weight'].to(dtype=input.dtype)
         output = input.matmul(weight.permute(*[i for i in range(len(weight.shape) - 2)], -1, -2))
         output += bias.unsqueeze(-2)
         return output
@@ -88,16 +87,54 @@ class FCBlock(nn.Module):
         output = self.net(coords)
         return output
 
+class TransformerBlock(nn.Module):
+    '''A lightweight transformer-based neural network.'''
+
+    def __init__(self, in_features, out_features, num_layers, hidden_features, nhead=4, **kwargs):
+        super().__init__()
+        self.input_proj = nn.Linear(in_features, hidden_features)
+        
+        # List of valid arguments for nn.TransformerEncoderLayer
+        valid_args = ['activation', 'dropout', 'layer_norm_eps', 'batch_first', 'norm_first', 'device', 'dtype']
+        
+        # Filter kwargs to only include valid arguments
+        encoder_layer_args = {key: kwargs[key] for key in kwargs if key in valid_args}
+        
+        encoder_layer = nn.TransformerEncoderLayer(d_model=hidden_features, nhead=nhead, **encoder_layer_args)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        self.output_proj = nn.Linear(hidden_features, out_features)
+
+    def forward(self, x):
+        # x: (batch_size, in_features)
+        x = self.input_proj(x)  # (batch_size, hidden_features)
+        # x = x.unsqueeze(0)  # (1, batch_size, hidden_features)
+        print(x.shape)
+        x = self.transformer_encoder(x)  # (1, batch_size, hidden_features)
+        x = x.squeeze(0)  # (batch_size, hidden_features)
+        x = self.output_proj(x)  # (batch_size, out_features)
+        print(f"{x.shape} is output shape")
+        return x
 
 class SingleBVPNet(nn.Module):
     '''A canonical representation network for a BVP.'''
 
     def __init__(self, out_features=1, type='sine', in_features=2,
-                 mode='mlp', hidden_features=256, num_hidden_layers=3, **kwargs):
+                 mode='mlp', hidden_features=256, num_hidden_layers=3, input_transform_function=None, **kwargs):
         super().__init__()
         self.mode = mode
-        self.net = FCBlock(in_features=in_features, out_features=out_features, num_hidden_layers=num_hidden_layers,
-                           hidden_features=hidden_features, outermost_linear=True, nonlinearity=type)
+        self.input_transform_function = input_transform_function
+
+        # Extract 'final_layer_factor' if present
+        self.final_layer_factor = kwargs.pop('final_layer_factor', None)
+
+        if mode == 'mlp':
+            self.net = FCBlock(in_features=in_features, out_features=out_features, num_hidden_layers=num_hidden_layers,
+                               hidden_features=hidden_features, outermost_linear=True, nonlinearity=type, **kwargs)
+        elif mode == 'transformer':
+            self.net = TransformerBlock(in_features=in_features, out_features=out_features, num_layers=num_hidden_layers,
+                                        hidden_features=hidden_features, **kwargs)
+        else:
+            raise ValueError("mode must be 'mlp' or 'transformer'")
         print(self)
 
     def forward(self, model_input, params=None):
