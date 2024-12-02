@@ -28,7 +28,7 @@ p.add_argument('--lr', type=float, default=2e-5, help='learning rate. default=2e
 p.add_argument('--num_epochs', type=int, default=100000,
                help='Number of epochs to train for.')
 
-p.add_argument('--epochs_til_ckpt', type=int, default=10,
+p.add_argument('--epochs_til_ckpt', type=int, default=1000,
                help='Time interval in seconds until checkpoint is saved.')
 p.add_argument('--steps_til_summary', type=int, default=100,
                help='Time interval in seconds until tensorboard summary is saved.')
@@ -153,5 +153,5 @@ def val_fn(model, ckpt_dir, epoch):
 training.train(model=model, train_dataloader=dataloader, epochs=opt.num_epochs, lr=opt.lr,
                steps_til_summary=opt.steps_til_summary, epochs_til_checkpoint=opt.epochs_til_ckpt,
                model_dir=root_path, loss_fn=loss_fn, clip_grad=opt.clip_grad,
-               use_lbfgs=opt.use_lbfgs, validation_fn=val_fn, start_epoch=opt.checkpoint_toload,
+               use_lbfgs=opt.use_lbfgs, validation_fn=None, start_epoch=opt.checkpoint_toload,
                adjust_relative_grads=opt.adjust_relative_grads, args=opt.__dict__)
